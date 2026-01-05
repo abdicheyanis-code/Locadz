@@ -1,16 +1,12 @@
-# 🚀 Guide de Lancement LOCADZ
 
-Ton application est prête ! Voici comment la mettre entre les mains de tes utilisateurs.
+# 🚀 Script SQL pour Supabase
 
-## 1. Configurer la base de données (Supabase)
-1. Crée un projet sur [Supabase](https://supabase.com/).
-2. Ouvre l'**SQL Editor** dans ton tableau de bord Supabase.
-3. Copie et exécute ce script pour créer toutes les tables :
+Copie tout ce bloc et colle-le dans le **SQL Editor** de ton projet Supabase, puis clique sur **RUN** :
 
 ```sql
--- Table des Utilisateurs
-CREATE TABLE IF NOT EXISTS public.users (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+-- 1. Table des Utilisateurs
+CREATE TABLE public.users (
+    id uuid PRIMARY KEY,
     full_name text,
     email text UNIQUE,
     phone_number text,
@@ -24,8 +20,8 @@ CREATE TABLE IF NOT EXISTS public.users (
     created_at timestamptz DEFAULT now()
 );
 
--- Table des Propriétés
-CREATE TABLE IF NOT EXISTS public.properties (
+-- 2. Table des Propriétés
+CREATE TABLE public.properties (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     host_id uuid REFERENCES public.users(id),
     title text,
@@ -40,16 +36,16 @@ CREATE TABLE IF NOT EXISTS public.properties (
     created_at timestamptz DEFAULT now()
 );
 
--- Table des Images
-CREATE TABLE IF NOT EXISTS public.property_images (
+-- 3. Table des Images
+CREATE TABLE public.property_images (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     property_id uuid REFERENCES public.properties(id) ON DELETE CASCADE,
     image_url text,
     created_at timestamptz DEFAULT now()
 );
 
--- Table des Réservations
-CREATE TABLE IF NOT EXISTS public.bookings (
+-- 4. Table des Réservations
+CREATE TABLE public.bookings (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     property_id uuid REFERENCES public.properties(id),
     traveler_id uuid REFERENCES public.users(id),
@@ -64,8 +60,8 @@ CREATE TABLE IF NOT EXISTS public.bookings (
     created_at timestamptz DEFAULT now()
 );
 
--- Table des Avis
-CREATE TABLE IF NOT EXISTS public.reviews (
+-- 5. Table des Avis
+CREATE TABLE public.reviews (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     property_id uuid REFERENCES public.properties(id),
     user_id uuid REFERENCES public.users(id),
@@ -76,42 +72,19 @@ CREATE TABLE IF NOT EXISTS public.reviews (
     created_at timestamptz DEFAULT now()
 );
 
--- Table des Favoris
-CREATE TABLE IF NOT EXISTS public.favorites (
+-- 6. Table des Favoris
+CREATE TABLE public.favorites (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     traveler_id uuid REFERENCES public.users(id),
     property_id uuid REFERENCES public.properties(id),
     created_at timestamptz DEFAULT now()
 );
 
--- Sécurité RLS (Autoriser tout pour le test, à restreindre plus tard)
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All" ON public.users FOR ALL USING (true) WITH CHECK (true);
-ALTER TABLE public.properties ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All" ON public.properties FOR ALL USING (true) WITH CHECK (true);
-ALTER TABLE public.property_images ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All" ON public.property_images FOR ALL USING (true) WITH CHECK (true);
-ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All" ON public.bookings FOR ALL USING (true) WITH CHECK (true);
-ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All" ON public.reviews FOR ALL USING (true) WITH CHECK (true);
-ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All" ON public.favorites FOR ALL USING (true) WITH CHECK (true);
+-- 7. Désactiver RLS (Indispensable pour que ça marche tout de suite)
+ALTER TABLE public.users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.properties DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.property_images DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.bookings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.favorites DISABLE ROW LEVEL SECURITY;
 ```
-
-## 2. Déployer sur le Web
-1. Mets ton code sur **GitHub**.
-2. Connecte-toi sur [Vercel](https://vercel.com/).
-3. Clique sur **"Add New" > "Project"** et choisis ton dépôt.
-4. **CRUCIAL** : Dans l'onglet "Environment Variables", ajoute :
-   - **Key** : `API_KEY`
-   - **Value** : (Ta clé API Gemini de Google AI Studio)
-5. Clique sur **Deploy**.
-
-## 3. Utiliser sur ton téléphone
-Une fois ton site en ligne (ex: `locadz.vercel.app`) :
-1. Ouvre le lien sur ton téléphone.
-2. **Sur iPhone** : Appuie sur l'icône de partage (le petit carré avec une flèche) et sélectionne **"Sur l'écran d'accueil"**.
-3. **Sur Android** : Appuie sur les trois points en haut à droite et sélectionne **"Installer l'application"**.
-
-Voilà ! Tu as maintenant une vraie icône "LOCADZ" sur ton téléphone. 🚀
